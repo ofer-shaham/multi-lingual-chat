@@ -1,5 +1,5 @@
 # multi-lingual-chat
-Node-Red multi-lingual chat application
+multi-lingual chat application generated using Node-Red
 
 
 ![chat-heb](https://raw.githubusercontent.com/ofer-shaham/multi-lingual-chat/main/images/he.png)
