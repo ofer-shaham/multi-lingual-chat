@@ -1,0 +1,474 @@
+[
+    {
+        "id": "ce93340fa42272b3",
+        "type": "tab",
+        "label": "dashboard",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "9f5bae708af84a7a",
+        "type": "group",
+        "z": "ce93340fa42272b3",
+        "style": {
+            "stroke": "#1e1d28",
+            "stroke-opacity": "1",
+            "fill": "#2b293a",
+            "fill-opacity": "0.5",
+            "label": true,
+            "label-position": "nw",
+            "color": "#ececec"
+        },
+        "nodes": [
+            "d511eb73a2746fc1",
+            "f857011d37104b61",
+            "4d16c34b974dfaae",
+            "e890eb4714d3f85b"
+        ],
+        "x": 354,
+        "y": 499,
+        "w": 732,
+        "h": 222
+    },
+    {
+        "id": "6eef77f0e3c5a9d4",
+        "type": "ui_text",
+        "z": "ce93340fa42272b3",
+        "group": "59574ce5d8de6fbb",
+        "order": 1,
+        "width": "6",
+        "height": "6",
+        "name": "",
+        "label": "content",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "className": "",
+        "x": 1320,
+        "y": 40,
+        "wires": [],
+        "info": "https://meta.wikimedia.org/wiki/Template:List_of_language_names_ordered_by_code"
+    },
+    {
+        "id": "a0d475a0e5b89ad2",
+        "type": "ui_dropdown",
+        "z": "ce93340fa42272b3",
+        "name": "language dropdown",
+        "label": "Language",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "59574ce5d8de6fbb",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "en",
+                "value": "en",
+                "type": "str"
+            },
+            {
+                "label": "es",
+                "value": "es",
+                "type": "str"
+            },
+            {
+                "label": "he",
+                "value": "he",
+                "type": "str"
+            },
+            {
+                "label": "it",
+                "value": "it",
+                "type": "str"
+            },
+            {
+                "label": "ru",
+                "value": "ru",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "topicType": "str",
+        "className": "",
+        "x": 210,
+        "y": 420,
+        "wires": [
+            [
+                "d511eb73a2746fc1",
+                "7cfea48e85ddfcf0"
+            ]
+        ],
+        "info": "https://meta.wikimedia.org/wiki/Template:List_of_language_names_ordered_by_code"
+    },
+    {
+        "id": "9df7039202568465",
+        "type": "ui_form",
+        "z": "ce93340fa42272b3",
+        "name": "",
+        "label": "Post",
+        "group": "59574ce5d8de6fbb",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "options": [
+            {
+                "label": "sender",
+                "value": "sender",
+                "type": "text",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "content",
+                "value": "content",
+                "type": "text",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "sender": "",
+            "content": ""
+        },
+        "payload": "",
+        "submit": "submit",
+        "cancel": "cancel",
+        "topic": "topic",
+        "topicType": "msg",
+        "splitLayout": "",
+        "className": "",
+        "x": 170,
+        "y": 200,
+        "wires": [
+            [
+                "4eb7e512c325a803"
+            ]
+        ]
+    },
+    {
+        "id": "1698ae488c1ecdf4",
+        "type": "inject",
+        "z": "ce93340fa42272b3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"sender\":1, \"content\":22}",
+        "payloadType": "json",
+        "x": 190,
+        "y": 160,
+        "wires": [
+            [
+                "4eb7e512c325a803"
+            ]
+        ]
+    },
+    {
+        "id": "4eb7e512c325a803",
+        "type": "function",
+        "z": "ce93340fa42272b3",
+        "name": "update flow and set payload with messages",
+        "func": "let pastSenders;\nconst rows = [];\n\n    if (msg.payload.translations){\n    let translations = msg.payload.translations;\n    pastSenders = flow.get('senders') || [];\n\n    for (let i = 0; i < translations.length; i++) {\n      rows.push([pastSenders[i] , translations[i]]);\n \n    }\n\n} else  {\n  let pastMessages;\n  pastMessages = flow.get('messages') || [];\n  pastSenders = flow.get('senders') || [];\n\n  //add the couple\nif(msg.payload.content && msg.payload.sender){\n\n  //add new message\n  pastMessages.unshift(msg.payload.content);\n  flow.set('messages', pastMessages)\n\n  //add new sender\n  pastSenders.unshift(msg.payload.sender);\n  flow.set('senders', pastSenders)\n}\n\n   //prepare for next node\n\n  for (let i = 0; i < pastMessages.length; i++) {\n    rows.push([pastSenders[i], pastMessages[i]]);\n\n  }\n}\nmsg.payload = rows;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 80,
+        "wires": [
+            [
+                "cf74f2e53ad6dfaa",
+                "022c101966af18e2",
+                "17abb2f8aae7ede7"
+            ]
+        ]
+    },
+    {
+        "id": "cf74f2e53ad6dfaa",
+        "type": "debug",
+        "z": "ce93340fa42272b3",
+        "name": "debug form",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1250,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "d511eb73a2746fc1",
+        "type": "debug",
+        "z": "ce93340fa42272b3",
+        "g": "9f5bae708af84a7a",
+        "name": "exp msg",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "f857011d37104b61",
+        "type": "http request",
+        "z": "ce93340fa42272b3",
+        "g": "9f5bae708af84a7a",
+        "name": "translate dog",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl={{{languageTo}}}&dt=t&q={{{messages}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 690,
+        "y": 540,
+        "wires": [
+            [
+                "4d16c34b974dfaae"
+            ]
+        ]
+    },
+    {
+        "id": "4d16c34b974dfaae",
+        "type": "function",
+        "z": "ce93340fa42272b3",
+        "g": "9f5bae708af84a7a",
+        "name": "flow set translatedMessages",
+        "func": " let translatedMessages = msg.payload;\n\nmsg.payload = {\n     \"translations\": JSON.parse(translatedMessages)[0][0][0].split('|$|')\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 560,
+        "wires": [
+            [
+                "d511eb73a2746fc1",
+                "4eb7e512c325a803"
+            ]
+        ]
+    },
+    {
+        "id": "e890eb4714d3f85b",
+        "type": "function",
+        "z": "ce93340fa42272b3",
+        "g": "9f5bae708af84a7a",
+        "name": "join messages ",
+        "func": "\n\n//convert to array\nconst languageTo = flow.get('languageTo');\nconst messages = flow.get('messages') || [];\nif (languageTo && languageTo!='en'){\n\n\nlet joinedMessages = messages? messages.map(item => encodeURIComponent(item)).join(\"|$|\"): '';\nreturn { \"messages\": joinedMessages,  languageTo};\n\n} else {\n    return { \"messages\": messages, languageTo };\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 680,
+        "wires": [
+            [
+                "d511eb73a2746fc1",
+                "f857011d37104b61"
+            ]
+        ]
+    },
+    {
+        "id": "022c101966af18e2",
+        "type": "function",
+        "z": "ce93340fa42272b3",
+        "name": "print flow.messages",
+        "func": " const messages = flow.get('messages');\n\nmsg.payload = {\n     messages\n }\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 320,
+        "wires": [
+            [
+                "cf74f2e53ad6dfaa"
+            ]
+        ]
+    },
+    {
+        "id": "60f935d7b842150b",
+        "type": "ui_text_input",
+        "z": "ce93340fa42272b3",
+        "name": "",
+        "label": "Sender",
+        "tooltip": "filter by sender",
+        "group": "59574ce5d8de6fbb",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": 300,
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 200,
+        "y": 300,
+        "wires": [
+            [
+                "4056d3373974ad13"
+            ]
+        ]
+    },
+    {
+        "id": "4056d3373974ad13",
+        "type": "function",
+        "z": "ce93340fa42272b3",
+        "name": "set filter by sender",
+        "func": "if(msg.payload){\n\n    flow.set('filteredSender', msg.payload)\n} else \n{\n    flow.set('filteredSender', null)\n\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 180,
+        "wires": [
+            [
+                "cf74f2e53ad6dfaa",
+                "4eb7e512c325a803"
+            ]
+        ]
+    },
+    {
+        "id": "17abb2f8aae7ede7",
+        "type": "function",
+        "z": "ce93340fa42272b3",
+        "name": "nested array to string, include only filtered sender",
+        "func": "\nconst rows = msg.payload;\nconst filteredSender = flow.get('filteredSender');\n\nconst arrOfCombinedStrings = [];\nfor (let i = 0; i < rows.length; i++) {\n\n  if(filteredSender ){\n    if (filteredSender === rows[i][0] ){\n      arrOfCombinedStrings.push( rows[i][0] + ': ' + rows[i][1]);\n\n    }\n  } else {\n\n  arrOfCombinedStrings.push(rows[i][0] + ': ' + rows[i][1]);\n  }\n\n}\nmsg.payload = arrOfCombinedStrings.join(\"</br>\");\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 60,
+        "wires": [
+            [
+                "6eef77f0e3c5a9d4",
+                "cf74f2e53ad6dfaa"
+            ]
+        ]
+    },
+    {
+        "id": "cd9b7a94a797c0f9",
+        "type": "ui_button",
+        "z": "ce93340fa42272b3",
+        "name": "",
+        "group": "59574ce5d8de6fbb",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "reset",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 210,
+        "y": 340,
+        "wires": [
+            [
+                "6ed886a7d2b1c29a"
+            ]
+        ]
+    },
+    {
+        "id": "6ed886a7d2b1c29a",
+        "type": "function",
+        "z": "ce93340fa42272b3",
+        "name": "set filter by sender",
+        "func": " \n    flow.set('senders', []);\n    flow.set('messages', [])\n    flow.set('filteredSender', null)\n\n return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 340,
+        "wires": [
+            [
+                "4eb7e512c325a803"
+            ]
+        ]
+    },
+    {
+        "id": "7cfea48e85ddfcf0",
+        "type": "function",
+        "z": "ce93340fa42272b3",
+        "name": "set language",
+        "func": " \n    flow.set('languageTo', msg.payload);\n    \n return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 580,
+        "wires": [
+            [
+                "e890eb4714d3f85b"
+            ]
+        ]
+    },
+    {
+        "id": "59574ce5d8de6fbb",
+        "type": "ui_group",
+        "name": "group1",
+        "tab": "27560141c3788fb0",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "27560141c3788fb0",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
